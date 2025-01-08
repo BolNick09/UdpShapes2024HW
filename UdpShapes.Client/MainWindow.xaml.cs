@@ -119,6 +119,15 @@ public partial class MainWindow : Window {
             lock (players)
                 players.Remove (message.Leave.Id);
         }
+        else if (message.Recoloured is not null && message.Recoloured.Id != myId)//Перекрасить фигуру у других игроков
+        {
+            lock (players)
+            {
+                Player player = players[message.Recoloured.Id];  // достать текущее состояние игрока
+                player.NamedColor = NamedColor.GetById((message.Recoloured.ColourId));//Изменить цвет фигуры
+                players[player.Id] = player;  // перезаписать
+            }
+        }
     }
 
     // Таскание себя
@@ -167,48 +176,48 @@ public partial class MainWindow : Window {
 
     private async void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
+        //Определение нажатия по фигуре
         Point mouse = e.GetPosition(this);
         Player me = Me;
         // если попал по фигуре
         if (mouse.X >= me.Pos.X && mouse.X < (me.Pos.X + 50) * me.size
             && mouse.Y >= me.Pos.Y && mouse.Y < (me.Pos.Y + 50) * me.size)
             lastDragging = mouse;
-
+        //Перебор ID цвета
         int colourId = me.NamedColor.Id;
         colourId++;
         if (colourId == NamedColor.All.Count)
             colourId = 0;
-        if (players.Count > 1)
-        {
-            bool canChange = false;
+        //Проверка, чтобы цвета не совпадали (не работает)
+        //if (players.Count > 1)
+        //{
+        //    bool canChange = false;
 
-            while (!canChange)
-            {
-                foreach (KeyValuePair<int, Player> entry in players)
-                {
-                    int playerId = entry.Key; // Получаем идентификатор игрока
-                    Player player = entry.Value; // Получаем экземпляр Player
-                    if (player.Id == colourId)
-                    {
-                        canChange = false;
-                        colourId++;
-                    }
-                }
+        //    while (!canChange)
+        //    {
+        //        foreach (KeyValuePair<int, Player> entry in players)
+        //        {
+        //            int playerId = entry.Key; // Получаем идентификатор игрока
+        //            Player player = entry.Value; // Получаем экземпляр Player
+        //            if (player.Id == colourId)
+        //            {
+        //                canChange = false;
+        //                colourId++;
+        //            }
+        //        }
 
-            }
-        }
-
+        //    }
+        //}
+        //Изменение цвета
         me.NamedColor = NamedColor.GetById(colourId);
         lock (players)
             players[me.Id] = me;  // заместить меня в коллекции
-
-
-
-        await SendMessage // сказать всем игрокам, что я передвинулся
+        //Отправка сообщения всем об изменении
+        await SendMessage 
         (
             new Message
             {
-                Recoloured = new RecolouredMessage { Id = myId }
+                Recoloured = new RecolouredMessage { Id = myId, ColourId = colourId }
             }
         );
     }

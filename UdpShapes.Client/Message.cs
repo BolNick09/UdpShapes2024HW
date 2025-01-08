@@ -48,4 +48,5 @@ public class LeaveMessage {
 public class RecolouredMessage
 {
     public int Id { get; set; }
+    public int ColourId { get; set; }
 }
