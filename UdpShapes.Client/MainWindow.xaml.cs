@@ -167,49 +167,49 @@ public partial class MainWindow : Window {
 
     private async void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
-        //Point mouse = e.GetPosition(this);
-        //Player me = Me;
-        //// если попал по фигуре
-        //if (mouse.X >= me.Pos.X && mouse.X < (me.Pos.X + 50) * me.size
-        //    && mouse.Y >= me.Pos.Y && mouse.Y < (me.Pos.Y + 50) * me.size)
-        //    lastDragging = mouse;
+        Point mouse = e.GetPosition(this);
+        Player me = Me;
+        // если попал по фигуре
+        if (mouse.X >= me.Pos.X && mouse.X < (me.Pos.X + 50) * me.size
+            && mouse.Y >= me.Pos.Y && mouse.Y < (me.Pos.Y + 50) * me.size)
+            lastDragging = mouse;
 
-        //int colourId = me.NamedColor.Id;
-        //colourId++;
-        //if (colourId == NamedColor.All.Count)
-        //    colourId = 0;
-        //if (players.Count > 1)
-        //{
-        //    bool canChange = false;
+        int colourId = me.NamedColor.Id;
+        colourId++;
+        if (colourId == NamedColor.All.Count)
+            colourId = 0;
+        if (players.Count > 1)
+        {
+            bool canChange = false;
 
-        //    while (!canChange)
-        //    {
-        //        foreach (KeyValuePair<int, Player> entry in players)
-        //        {
-        //            int playerId = entry.Key; // Получаем идентификатор игрока
-        //            Player player = entry.Value; // Получаем экземпляр Player
-        //            if (player.Id == colourId)
-        //            {
-        //                canChange = false;
-        //                colourId++;
-        //            }
-        //        }
+            while (!canChange)
+            {
+                foreach (KeyValuePair<int, Player> entry in players)
+                {
+                    int playerId = entry.Key; // Получаем идентификатор игрока
+                    Player player = entry.Value; // Получаем экземпляр Player
+                    if (player.Id == colourId)
+                    {
+                        canChange = false;
+                        colourId++;
+                    }
+                }
 
-        //    }
-        //}
-        
-        //me.NamedColor = NamedColor.GetById ( colourId );    
-        //lock (players)
-        //    players[me.Id] = me;  // заместить меня в коллекции
+            }
+        }
+
+        me.NamedColor = NamedColor.GetById(colourId);
+        lock (players)
+            players[me.Id] = me;  // заместить меня в коллекции
 
 
 
-        //await SendMessage // сказать всем игрокам, что я передвинулся
-        //(
-        //    new Message
-        //    {
-        //        Recoloured = new RecolouredMessage { Id = myId }
-        //    }
-        //);
+        await SendMessage // сказать всем игрокам, что я передвинулся
+        (
+            new Message
+            {
+                Recoloured = new RecolouredMessage { Id = myId }
+            }
+        );
     }
 }
