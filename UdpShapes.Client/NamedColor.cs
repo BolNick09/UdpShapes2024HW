@@ -2,7 +2,8 @@
 
 namespace UdpShapes.Client;
 
-public record NamedColor {
+public record NamedColor 
+{
     public static NamedColor Red { get; } = new (0, "Красный", Colors.Red);
     public static NamedColor Orange { get; } = new (1, "Оранжевый", Colors.Orange);
     public static NamedColor Yellow { get; } = new (2, "Жёлтый", Colors.Yellow);
@@ -28,6 +29,10 @@ public record NamedColor {
         this.Name = name;
         this.Color = color;
         this.Brush = new SolidColorBrush (color);
+    }
+    public static NamedColor GetById(int colourId)
+    {
+        return IdToColor[colourId];
     }
 
     public override string ToString () => Name;

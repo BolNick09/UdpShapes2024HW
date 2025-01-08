@@ -15,6 +15,7 @@
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -58,8 +59,19 @@
             ItemsSource="{Binding Shapes}"
             SelectedItem="{Binding Shape}" />
 
+        <Label
+        Grid.Row="3" Grid.Column="0"
+        VerticalAlignment="Center">Размер</Label>
+        <ComboBox
+        Grid.Row="3" Grid.Column="1" x:Name="cbbSize"
+        VerticalAlignment="Center">
+            <ComboBoxItem Content="Малый" />
+            <ComboBoxItem Content="Средний" />
+            <ComboBoxItem Content="Большой" />
+        </ComboBox>
+
         <Button
-            Grid.Row="3" Grid.Column="1"
+            Grid.Row="4" Grid.Column="1"
             VerticalAlignment="Center" Padding="24"
             Click="ConnectButton_Click">Подключиться</Button>
     </Grid>

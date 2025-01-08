@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
@@ -17,7 +18,8 @@ public partial class MainWindow : Window {
     private CancellationTokenSource cancel = new CancellationTokenSource ();
     private UdpClient server;
 
-    public MainWindow (Player me) {
+    public MainWindow (Player me) 
+    {
         InitializeComponent ();
 
         this.myId = me.Id;
@@ -73,39 +75,47 @@ public partial class MainWindow : Window {
     }
 
     // Отправить сообщение с помощью сериализации JSON
-    private async Task SendMessage (Message message) {
+    private async Task SendMessage (Message message) 
+    {
         string json = JsonSerializer.Serialize (message);
         byte[] bytes = Encoding.UTF8.GetBytes (json);
         await server.SendAsync (bytes);
     }
 
     // Десериализовать сообщение. Отреагировать на него
-    private async Task ProcessMessage (byte[] datagram) {
+    private async Task ProcessMessage (byte[] datagram) 
+    {
         string json = Encoding.UTF8.GetString (datagram);
         Message message = JsonSerializer.Deserialize<Message> (json) ?? throw new NullReferenceException ();
 
-        if (message.Entered is not null) {
-            Player player = Player.FromEntered (message.Entered);  // десериализовать нового игрока
+        if (message.Entered is not null)// десериализовать нового игрока 
+        {
+            Player player = Player.FromEntered (message.Entered);  
             lock (players)  // добавить в коллекцию
                 players[player.Id] = player;
 
-            await SendMessage (new Message {  // послать сообщение в ответ, что я существую
+            await SendMessage (new Message // послать сообщение в ответ, что я существую
+            {  
                 Existing = Me.ToExistingMessage ()
             });
         }
-        else if (message.Existing is not null) {
-            Player player = Player.FromExisting (message.Existing);  // десериализовать существующего игрока
+        else if (message.Existing is not null)// десериализовать существующего игрока 
+        {
+            Player player = Player.FromExisting (message.Existing);  
             lock (players)  // добавить в коллекцию
                 players[player.Id] = player;
         }
-        else if (message.Move is not null && message.Move.Id != myId) {  // двигать других, но не себя
-            lock (players) {
+        else if (message.Move is not null && message.Move.Id != myId) // двигать других, но не себя
+        {  
+            lock (players) 
+            {
                 Player player = players[message.Move.Id];  // достать текущее состояние игрока
                 player = player.Move (message.Move.Pos);  // создать новое, передвинутое состояние
                 players[player.Id] = player;  // перезаписать
             }
         }
-        else if (message.Leave is not null) {
+        else if (message.Leave is not null) 
+        {
             lock (players)
                 players.Remove (message.Leave.Id);
         }
@@ -114,17 +124,22 @@ public partial class MainWindow : Window {
     // Таскание себя
     // Хранит последнюю известную позицию мышки. Если не таскаем, то null.
     private Point? lastDragging = null;
-    private void Window_MouseDown (object sender, MouseButtonEventArgs e) {
-        Point mouse = e.GetPosition (this);  // позиция мышки относительно клиентской области окна
+    private void Window_MouseDown (object sender, MouseButtonEventArgs e) 
+    {
+        // позиция мышки относительно клиентской области окна
+        Point mouse = e.GetPosition (this);  
 
         Player me = Me;
-        if (mouse.X >= me.Pos.X && mouse.X < me.Pos.X + 50  // если попал по фигуре
-            && mouse.Y >= me.Pos.Y && mouse.Y < me.Pos.Y + 50)
+        // если попал по фигуре
+        if (mouse.X >= me.Pos.X && mouse.X < (me.Pos.X + 50) * me.size  
+            && mouse.Y >= me.Pos.Y && mouse.Y < (me.Pos.Y + 50) * me.size)
             lastDragging = mouse;
     }
 
-    private async void Window_MouseMove (object sender, MouseEventArgs e) {
-        if (lastDragging is null) return;
+    private async void Window_MouseMove (object sender, MouseEventArgs e) 
+    {
+        if (lastDragging is null) 
+            return;
 
         Point newMouse = e.GetPosition (this);  // новая позиция мышки
         double addX = newMouse.X - lastDragging.Value.X;  // насколько мышка сдвинулась с прошлого раза?
@@ -138,8 +153,10 @@ public partial class MainWindow : Window {
 
         lastDragging = newMouse;
 
-        await SendMessage (  // сказать всем игрокам, что я передвинулся
-            new Message {
+        await SendMessage // сказать всем игрокам, что я передвинулся
+        (  
+            new Message 
+            {
                 Move = new MoveMessage { Id = myId, Pos = newPos }
             }
         );
@@ -147,4 +164,52 @@ public partial class MainWindow : Window {
 
     private void Window_MouseUp (object sender, MouseButtonEventArgs e) =>
         lastDragging = null;
+
+    private async void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        //Point mouse = e.GetPosition(this);
+        //Player me = Me;
+        //// если попал по фигуре
+        //if (mouse.X >= me.Pos.X && mouse.X < (me.Pos.X + 50) * me.size
+        //    && mouse.Y >= me.Pos.Y && mouse.Y < (me.Pos.Y + 50) * me.size)
+        //    lastDragging = mouse;
+
+        //int colourId = me.NamedColor.Id;
+        //colourId++;
+        //if (colourId == NamedColor.All.Count)
+        //    colourId = 0;
+        //if (players.Count > 1)
+        //{
+        //    bool canChange = false;
+
+        //    while (!canChange)
+        //    {
+        //        foreach (KeyValuePair<int, Player> entry in players)
+        //        {
+        //            int playerId = entry.Key; // Получаем идентификатор игрока
+        //            Player player = entry.Value; // Получаем экземпляр Player
+        //            if (player.Id == colourId)
+        //            {
+        //                canChange = false;
+        //                colourId++;
+        //            }
+        //        }
+
+        //    }
+        //}
+        
+        //me.NamedColor = NamedColor.GetById ( colourId );    
+        //lock (players)
+        //    players[me.Id] = me;  // заместить меня в коллекции
+
+
+
+        //await SendMessage // сказать всем игрокам, что я передвинулся
+        //(
+        //    new Message
+        //    {
+        //        Recoloured = new RecolouredMessage { Id = myId }
+        //    }
+        //);
+    }
 }

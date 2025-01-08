@@ -5,8 +5,10 @@ public partial class LoginWindow : Window {
         InitializeComponent ();
     }
 
-    private void ConnectButton_Click (object sender, RoutedEventArgs e) {
-        try {
+    private void ConnectButton_Click (object sender, RoutedEventArgs e) 
+    {
+        try 
+        {
             LoginVM vm = (LoginVM) this.DataContext;
             if (string.IsNullOrWhiteSpace (vm.Name))
                 throw new InvalidOperationException ("Введите имя");
@@ -14,9 +16,31 @@ public partial class LoginWindow : Window {
                 throw new InvalidOperationException ("Выберите цвет");
             if (vm.Shape is null)
                 throw new InvalidOperationException ("Выберите фигуру");
+            if (cbbSize.SelectedIndex == -1)
+                throw new InvalidOperationException ("Выберите размер");
+
+            switch (cbbSize.SelectedIndex)
+            {
+                case 0:
+                {
+                    vm.Size = 1;
+                    break;
+                }
+                case 1:
+                {
+                    vm.Size = 2;
+                    break;
+                }
+                case 2:
+                {
+                    vm.Size = 3;
+                    break;
+                }
+            }
 
 
-            Player player = new Player (vm.Name, vm.NamedColor, vm.Shape);
+
+            Player player = new Player (vm.Name, vm.NamedColor, vm.Shape, vm.Size);
 
             this.Hide ();
             MainWindow mainWindow = new MainWindow (player);

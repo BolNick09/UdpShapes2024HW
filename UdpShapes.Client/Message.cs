@@ -9,6 +9,7 @@ public class Message
     public ExistingMessage? Existing { get; set; }
     public MoveMessage? Move { get; set; }
     public LeaveMessage? Leave { get; set; }
+    public RecolouredMessage? Recoloured { get; set; }
 }
 
 // Когда новый клиент подключается, он рассылает всем сообщение Entered.
@@ -19,6 +20,7 @@ public class EnteredMessage {
     public string Name { get; set; }
     public int ColorId { get; set; }
     public int ShapeId { get; set; }
+    public int Size { get; set; }
     public Point Pos { get; set; }
 }
 
@@ -28,6 +30,7 @@ public class ExistingMessage {
     public string Name { get; set; }
     public int ColorId { get; set; }
     public int ShapeId { get; set; }
+    public int Size { get; set; }
     public Point Pos { get; set; }
 }
 
@@ -39,5 +42,10 @@ public class MoveMessage {
 
 // Перед уходом игрок рассылает всем сообщение Leave
 public class LeaveMessage {
+    public int Id { get; set; }
+}
+//Рассылка сообщения об изменении цвета
+public class RecolouredMessage
+{
     public int Id { get; set; }
 }
